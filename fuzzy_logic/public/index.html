@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulación HVAC - Lógica Difusa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>SISTEMA DE CONTROL <span class="highlight">DIFUSO</span></h1>
+            <p>Módulo de Control de Temperatura HVAC (Predictivo)</p>
+        </header>
+
+        <div class="dashboard">
+            <div class="card control-panel">
+                <h2>🎛️ Parámetros de Entrada</h2>
+                
+                <div class="input-group">
+                    <label>Temperatura Actual: <span id="val-current">25</span>°C</label>
+                    <input type="range" id="currentTemp" min="0" max="40" value="25" step="0.5">
+                </div>
+
+                <div class="input-group">
+                    <label>Temperatura Meta (SetPoint): <span id="val-target">20</span>°C</label>
+                    <input type="range" id="targetTemp" min="15" max="30" value="20" step="0.5">
+                </div>
+                
+                <div class="input-group">
+                    <label>Tasa de Cambio (ΔT): <span id="val-delta">0</span>°C/min</label>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: #94a3b8;">
+                        <span>❄️ Enfriando</span>
+                        <span>Estable</span>
+                        <span>🔥 Calentando</span>
+                    </div>
+                    <input type="range" id="rateOfChange" min="-5" max="5" value="0" step="0.5">
+                </div>
+
+                <div class="status-display">
+                    <p>Error del Sistema: <span id="val-error" class="digital-number">0.0</span></p>
+                </div>
+            </div>
+
+            <div class="card visual-panel">
+                <h2>🧠 Cerebro del Sistema</h2>
+                
+                <div class="chart-wrapper">
+                    <h3>🌡️ Estado Térmico (Error)</h3>
+                    <div class="chart-container-small">
+                        <canvas id="tempChart"></canvas>
+                    </div>
+                </div>
+            
+                <hr style="border: 0; border-top: 1px solid #334155; margin: 15px 0;">
+            
+                <div class="chart-wrapper">
+                    <h3>📈 Tendencia (Derivada)</h3>
+                    <div class="chart-container-small">
+                        <canvas id="trendChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card output-panel">
+                <h2>🚀 Potencia del Ventilador</h2>
+                <div class="fan-container">
+                    <div class="fan-blade" id="visualFan">☢</div>
+                </div>
+                <div class="speed-display">
+                    <span id="fanSpeedResult">0</span>%
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
