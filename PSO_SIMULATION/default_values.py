@@ -1,0 +1,9 @@
+c1:float = 2.05
+c2:float = 2.05
+w_max:float = 0.9
+w_min:float = 0.4
+quadratic_title = "Cuadrática"
+rosenbrock_title = "Rosenbrock"
+rastrigin_title = "Rastrigin"
+constriction_factor = "Factor de constricción"
+inertia_factor = "Factor de inercia"
