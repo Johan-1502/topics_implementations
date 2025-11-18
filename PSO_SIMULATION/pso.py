@@ -29,9 +29,10 @@ class PSO:
         self.c1: float = c1
         self.c2: float = c2
         self.w: float | None = w
-        self.gbest: np.ndarray | None = None
+        self.gbest: np.ndarray|None = None
         self.best_value: float | None = None
         self.particles: list[Particle] = []
+        self.iterations: list[Iteration] = []
 
     def update_inertia(self, current_iteration: int, quantity_of_iterations: int):
         self.w = w_max - (w_max - w_min) * (current_iteration / quantity_of_iterations)
@@ -51,6 +52,7 @@ class PSO:
             f"Información relevante: \n - c1: {self.c1}\n - c2: {self.c2}\n - gbest: {self.gbest}\n"
         )
         for i in range(self.quantity_of_iterations):
+            iteration = Iteration()
             for particle in self.particles:
                 if useConstrictionFactor:
                     self.calculate_velocity_by_constriction(particle)
@@ -60,7 +62,12 @@ class PSO:
                 self.update_position(particle)
                 self.update_pbest(particle, function)
                 particle.save_iteration()
+                iteration.add_particle_iteration(particle.iterations[i])
             self.define_gbest()
+            if self.gbest is not None:
+                iteration.set_gbest(self.gbest)
+            iteration.calculate_diversity()
+            self.iterations.append(iteration)
         print(f"Mejor valor encontrado: {self.gbest}")
         return self.gbest
 
@@ -144,13 +151,46 @@ class PSO:
 
 class ParticleIteration:
     def __init__(self, pbest: np.ndarray, position: np.ndarray, velocity: np.ndarray):
-        self.pbest: np.ndarray = pbest
-        self.position: np.ndarray = position
-        self.velocity: np.ndarray = velocity
+        self.pbest: np.ndarray = trunc_vector(pbest)
+        self.position: np.ndarray = trunc_vector(position)
+        self.velocity: np.ndarray = trunc_vector(velocity)
+        
 
 
 class Iteration:
 
-    def __init__(self, gbest: VectorResult):
-        self.gbest: VectorResult = gbest
+    def __init__(self):
+        self.particles_iterations:list[ParticleIteration]=[]
+        self.gbest:np.ndarray= np.array([])
         self.diversity: float = 0
+        
+    def add_particle_iteration(self, particle_iteration: ParticleIteration):
+        self.particles_iterations.append(particle_iteration)
+        
+    def calculate_diversity(self):
+        centroid = self.calculate_centroid()
+        norm_sumatory:float = 0
+        for particle in self.particles_iterations:
+            norm_sumatory += float(np.linalg.norm(particle.position - centroid))
+        diversity = norm_sumatory/len(self.particles_iterations)
+        self.diversity = math.trunc(diversity * 10**5) / 10**5
+
+    def calculate_centroid(self):
+        sumatory:np.ndarray|None = None
+        for particle in self.particles_iterations:
+            if sumatory is not None:
+                sumatory += particle.position
+            else:
+                sumatory = particle.position
+        if sumatory is not None:
+            return sumatory/len(self.particles_iterations)
+        
+    def set_gbest(self, gbest:np.ndarray):
+        self.gbest = trunc_vector(gbest)
+        
+
+def trunc_vector(vector: np.ndarray):
+    vector_to_return = []
+    for i in range(len(vector)):
+        vector_to_return.append(math.trunc(vector[i] * 10**5) / 10**5)
+    return np.array(vector_to_return)
